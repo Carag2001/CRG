@@ -35,6 +35,49 @@ section {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 40px;
 }
+.journal-header {
+  padding: 120px 10% 80px;
+  text-align: center;
+}
+
+.journal-header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.journal-header p {
+  opacity: 0.7;
+}
+
+.journal {
+  max-width: 800px;
+  margin: auto;
+}
+
+.entry {
+  padding: 80px 40px;
+}
+
+.entry .date {
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+.entry h2 {
+  margin-top: 10px;
+  font-size: 2rem;
+}
+
+.entry p {
+  line-height: 1.8;
+  margin-top: 20px;
+}
+
+.entry.dark {
+  background: #111;
+  color: #f5f5f5;
+}
+
 
 blockquote {
   font-size: 2rem;
