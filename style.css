@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  color: #111;
+}
+
+section {
+  padding: 100px 10%;
+}
+
+.light {
+  background: #f5f5f5;
+}
+
+.dark {
+  background: #111;
+  color: #f5f5f5;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+
+.buttons a {
+  margin-right: 15px;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid currentColor;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+}
+
+blockquote {
+  font-size: 2rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+footer {
+  text-align: center;
+  padding: 40px;
+  opacity: 0.6;
+}
