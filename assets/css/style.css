@@ -1,34 +1,66 @@
-/* ---------- JOURNAL ESTHÉTIQUE ---------- */
+/* ===============================
+   JOURNAL – STYLE ESTHÉTIQUE
+   =============================== */
 
-.entry {
-  max-width: 720px;
-  margin: auto;
-  font-size: 1.05rem;
+body {
+  background: #f4f3ef;
 }
 
-.entry h2 {
-  font-size: 2.4rem;
-  margin-bottom: 10px;
+/* En-tête journal */
+.journal-header {
+  padding: 140px 10% 100px;
+  text-align: center;
+}
+
+.journal-header h1 {
+  font-size: 3.2rem;
   letter-spacing: -0.02em;
 }
 
-.entry p {
-  line-height: 1.9;
-  margin-top: 18px;
-  opacity: 0.9;
-}
-
-.entry blockquote {
-  margin: 40px auto;
-  padding-left: 20px;
-  border-left: 3px solid currentColor;
-  font-style: italic;
+.journal-header p {
+  margin-top: 15px;
+  font-size: 1.05rem;
   opacity: 0.7;
-  max-width: 600px;
 }
 
-.entry .date {
-  font-size: 0.85rem;
-  opacity: 0.5;
-  margin-bottom: 20px;
+/* Entrées */
+.journal-entry {
+  max-width: 680px;
+  margin: 120px auto;
+  padding: 0 20px;
+}
+
+/* Titre du jour */
+.journal-entry h2 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+/* Texte */
+.journal-entry p {
+  font-size: 1.1rem;
+  line-height: 1.9;
+  margin-top: 20px;
+  color: #2a2a2a;
+}
+
+/* Citations */
+.journal-entry blockquote {
+  margin: 50px auto;
+  padding-left: 20px;
+  border-left: 3px solid #c7a46c;
+  font-style: italic;
+  color: #555;
+  max-width: 560px;
+}
+
+/* Séparation douce */
+.journal-entry::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: #d6d3cb;
+  margin: 80px auto 0;
 }
