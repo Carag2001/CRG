@@ -1,140 +1,34 @@
-/* ---------- BASE ---------- */
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
-  transition: background 0.6s ease, color 0.6s ease;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-}
-
-/* ---------- PALETTE ---------- */
-:root {
-  --bg-light: #f6f6f4;
-  --bg-dark: #0f0f10;
-  --text-light: #0f0f10;
-  --text-dark: #f6f6f4;
-  --accent: #6b8cff;
-}
-
-body {
-  background: var(--bg-light);
-  color: var(--text-light);
-}
-
-body.dark {
-  background: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-/* ---------- SECTIONS ---------- */
-.section {
-  padding: 120px 10%;
-}
-/* ---------- PROJETS ---------- */
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 40px;
-}
-
-.project-card {
-  padding: 40px;
-  border: 1px solid rgba(255,255,255,0.1);
-  text-decoration: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-  opacity: 0.85;
-}
-
-.project-card span {
-  display: block;
-  margin-top: 20px;
-  font-size: 0.9rem;
-  opacity: 0.6;
-}
-
-.section.light {
-  background: var(--bg-light);
-  color: var(--text-light);
-}
-
-.section.dark {
-  background: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-/* ---------- HERO ---------- */
-h1 {
-  font-size: 3rem;
-  margin-bottom: 20px;
-}
-
-.buttons a {
-  margin-right: 20px;
-}
-
-/* ---------- GRID ---------- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
-}
-
-/* ---------- JOURNAL ---------- */
-.journal-header {
-  text-align: center;
-}
+/* ---------- JOURNAL ESTHÉTIQUE ---------- */
 
 .entry {
-  max-width: 800px;
+  max-width: 720px;
   margin: auto;
-}
-
-.entry .date {
-  font-size: 0.9rem;
-  opacity: 0.6;
+  font-size: 1.05rem;
 }
 
 .entry h2 {
-  font-size: 2rem;
-  margin-top: 10px;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
 }
 
 .entry p {
-  margin-top: 20px;
+  line-height: 1.9;
+  margin-top: 18px;
+  opacity: 0.9;
 }
 
-/* ---------- BLOCKQUOTE ---------- */
-blockquote {
-  font-size: 2rem;
+.entry blockquote {
+  margin: 40px auto;
+  padding-left: 20px;
+  border-left: 3px solid currentColor;
   font-style: italic;
   opacity: 0.7;
+  max-width: 600px;
 }
 
-/* ---------- FOOTER ---------- */
-footer {
-  text-align: center;
-  padding: 40px;
-  opacity: 0.6;
-}
-
-/* ---------- THEME TOGGLE ---------- */
-#themeToggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  border: none;
-  background: transparent;
-  font-size: 1.4rem;
-  cursor: pointer;
-  z-index: 1000;
+.entry .date {
+  font-size: 0.85rem;
+  opacity: 0.5;
+  margin-bottom: 20px;
 }
