@@ -1,52 +1,907 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Journal & Projets</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Discord - Gestion de Serveur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0b0e;
+            --bg-secondary: #13151a;
+            --bg-tertiary: #1a1d24;
+            --accent-primary: #5865f2;
+            --accent-secondary: #eb459e;
+            --accent-tertiary: #57f287;
+            --text-primary: #f2f3f5;
+            --text-secondary: #b5bac1;
+            --text-tertiary: #6d7179;
+            --border-color: #2b2f38;
+            --success: #23a55a;
+            --warning: #f0b232;
+            --danger: #f23f42;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(88, 101, 242, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(235, 69, 158, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            overflow-y: auto;
+        }
+
+        .server-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .server-info h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-tertiary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-tertiary);
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.25rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(88, 101, 242, 0.15), rgba(235, 69, 158, 0.15));
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-primary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.blue { background: rgba(88, 101, 242, 0.15); color: var(--accent-primary); }
+        .stat-icon.pink { background: rgba(235, 69, 158, 0.15); color: var(--accent-secondary); }
+        .stat-icon.green { background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary); }
+        .stat-icon.yellow { background: rgba(240, 178, 50, 0.15); color: var(--warning); }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.5s backwards;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .card-action {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .card-action:hover {
+            color: var(--accent-secondary);
+        }
+
+        /* Activity Log */
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .activity-item:hover {
+            background: var(--bg-primary);
+            transform: translateX(4px);
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        /* Members List */
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .member-item:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .member-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-tertiary);
+        }
+
+        .member-status.online { background: var(--accent-tertiary); }
+        .member-status.idle { background: var(--warning); }
+        .member-status.offline { background: var(--text-tertiary); }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* Full Width Cards */
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        /* Role Badge */
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .role-badge.admin {
+            background: rgba(240, 71, 71, 0.15);
+            color: #f04747;
+            border: 1px solid rgba(240, 71, 71, 0.3);
+        }
+
+        .role-badge.moderator {
+            background: rgba(88, 101, 242, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
+
+        .role-badge.member {
+            background: rgba(87, 242, 135, 0.15);
+            color: var(--accent-tertiary);
+            border: 1px solid rgba(87, 242, 135, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="server-header">
+                <div class="server-icon">MS</div>
+                <div class="server-info">
+                    <h2>Mon Serveur</h2>
+                    <div class="server-status">
+                        <span class="status-dot"></span>
+                        <span>1,247 membres</span>
+                    </div>
+                </div>
+            </div>
 
-<button id="themeToggle">🌗</button>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <div class="nav-item active">
+                        <div class="nav-icon">📊</div>
+                        <span>Vue d'ensemble</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">👥</div>
+                        <span>Membres</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">💬</div>
+                        <span>Canaux</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🎭</div>
+                        <span>Rôles</span>
+                    </div>
+                </div>
 
-<section class="section light">
-  <h1>Je construis des projets.<br>J’écris ce que je vis.</h1>
-  <p>Journal public · Projets · Création</p>
+                <div class="nav-section">
+                    <div class="nav-section-title">Modération</div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🛡️</div>
+                        <span>AutoMod</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📋</div>
+                        <span>Logs</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚠️</div>
+                        <span>Avertissements</span>
+                    </div>
+                </div>
 
-  <div class="buttons">
-    <a href="projects.html">Explorer les projets</a>
-    <a href="journal.html">Lire le journal</a>
-  </div>
-</section>
+                <div class="nav-section">
+                    <div class="nav-section-title">Configuration</div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙️</div>
+                        <span>Paramètres</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🤖</div>
+                        <span>Bots</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🎨</div>
+                        <span>Personnalisation</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
 
-<section class="section dark">
-  <div class="grid">
-    <div>
-      <h2>Projets</h2>
-      <p>Des idées en construction constante.</p>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1>Vue d'ensemble</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">⚙️ Paramètres</button>
+                    <button class="btn btn-primary">✨ Inviter des membres</button>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">👥</div>
+                    </div>
+                    <div class="stat-label">Membres totaux</div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-change positive">↑ +23 cette semaine</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">✅</div>
+                    </div>
+                    <div class="stat-label">Membres en ligne</div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-change positive">↑ +12% vs hier</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon pink">💬</div>
+                    </div>
+                    <div class="stat-label">Messages (24h)</div>
+                    <div class="stat-value">8,934</div>
+                    <div class="stat-change positive">↑ +456 vs hier</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon yellow">⚠️</div>
+                    </div>
+                    <div class="stat-label">Alertes modération</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-change negative">↓ -2 vs hier</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Activity Log -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Activité récente</h3>
+                        <span class="card-action">Voir tout →</span>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon green" style="background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary);">
+                                ✅
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Nouveau membre rejoint</div>
+                                <div class="activity-meta">@Alexandre_42 a rejoint le serveur • Il y a 5 min</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon blue" style="background: rgba(88, 101, 242, 0.15); color: var(--accent-primary);">
+                                🎭
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Rôle modifié</div>
+                                <div class="activity-meta">@Marie a reçu le rôle Modérateur • Il y a 15 min</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon pink" style="background: rgba(235, 69, 158, 0.15); color: var(--accent-secondary);">
+                                💬
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Nouveau canal créé</div>
+                                <div class="activity-meta">#annonces-importantes a été créé • Il y a 1h</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon yellow" style="background: rgba(240, 178, 50, 0.15); color: var(--warning);">
+                                ⚠️
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Avertissement émis</div>
+                                <div class="activity-meta">@User123 a reçu un avertissement pour spam • Il y a 2h</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon green" style="background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary);">
+                                🤖
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Bot configuré</div>
+                                <div class="activity-meta">MusicBot a été ajouté au serveur • Il y a 3h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Members -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Membres actifs</h3>
+                        <span class="card-action">Voir tout →</span>
+                    </div>
+                    <div class="members-list">
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                AM
+                                <span class="member-status online"></span>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">Alexandre_M</div>
+                                <div class="member-role">
+                                    <span class="role-badge admin">Admin</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <div class="icon-btn">💬</div>
+                                <div class="icon-btn">⚙️</div>
+                            </div>
+                        </div>
+
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                ML
+                                <span class="member-status online"></span>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">Marie_L</div>
+                                <div class="member-role">
+                                    <span class="role-badge moderator">Modérateur</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <div class="icon-btn">💬</div>
+                                <div class="icon-btn">⚙️</div>
+                            </div>
+                        </div>
+
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                TD
+                                <span class="member-status idle"></span>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">Thomas_D</div>
+                                <div class="member-role">
+                                    <span class="role-badge member">Membre</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <div class="icon-btn">💬</div>
+                                <div class="icon-btn">⚙️</div>
+                            </div>
+                        </div>
+
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                SB
+                                <span class="member-status online"></span>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">Sophie_B</div>
+                                <div class="member-role">
+                                    <span class="role-badge member">Membre</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <div class="icon-btn">💬</div>
+                                <div class="icon-btn">⚙️</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Width Card - Moderation -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <h3 class="card-title">Paramètres de modération rapide</h3>
+                    <span class="card-action">Configurer →</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon blue">🛡️</div>
+                        </div>
+                        <div class="stat-label">Niveau de vérification</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">Élevé</div>
+                        <div class="stat-change" style="color: var(--text-secondary);">Email vérifié requis</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon green">✅</div>
+                        </div>
+                        <div class="stat-label">Filtre de contenu</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">Actif</div>
+                        <div class="stat-change" style="color: var(--text-secondary);">Tous les membres</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon pink">🔒</div>
+                        </div>
+                        <div class="stat-label">Messages DM</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">Restreint</div>
+                        <div class="stat-change" style="color: var(--text-secondary);">Nouveaux membres</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon yellow">⏱️</div>
+                        </div>
+                        <div class="stat-label">Timeout automatique</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">10 min</div>
+                        <div class="stat-change" style="color: var(--text-secondary);">Après 3 avertissements</div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <div>
-      <h2>Journal</h2>
-      <p>Pensées, doutes, avancées. Tout est écrit.</p>
-    </div>
-    <div>
-      <h2>Création</h2>
-      <p>Design, code, évolution.</p>
-    </div>
-  </div>
-</section>
 
-<section class="section light">
-  <blockquote>
-    Ce site n’est pas terminé.<br>
-    Moi non plus.
-  </blockquote>
-</section>
+    <script>
+        // Simulate real-time updates
+        function updateStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach((stat, index) => {
+                if (Math.random() > 0.7) {
+                    const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
+                    const change = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, currentValue + change);
+                    stat.textContent = newValue.toLocaleString('fr-FR');
+                }
+            });
+        }
 
-<footer>
-  <p>© Journal vivant</p>
-</footer>
+        // Update stats every 5 seconds
+        setInterval(updateStats, 5000);
 
-<script src="assets/js/theme-scroll.js"></script>
+        // Navigation interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Member action buttons
+        document.querySelectorAll('.icon-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+
+        // Activity items hover effect
+        document.querySelectorAll('.activity-item, .member-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+        });
+    </script>
 </body>
 </html>
