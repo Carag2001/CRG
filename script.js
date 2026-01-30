@@ -498,7 +498,7 @@ const portfolioBtns = document.querySelectorAll('.portfolio-btn');
 
 portfolioBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        alert('Détails du projet bientôt disponibles ! 🚀');
+        alert('MERCI DE REJOINDRE LE SERVEUR DISCORD');
     });
 });
 
