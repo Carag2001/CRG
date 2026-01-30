@@ -3,905 +3,1130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Discord - Gestion de Serveur</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0b0e;
-            --bg-secondary: #13151a;
-            --bg-tertiary: #1a1d24;
-            --accent-primary: #5865f2;
-            --accent-secondary: #eb459e;
-            --accent-tertiary: #57f287;
-            --text-primary: #f2f3f5;
-            --text-secondary: #b5bac1;
-            --text-tertiary: #6d7179;
-            --border-color: #2b2f38;
-            --success: #23a55a;
-            --warning: #f0b232;
-            --danger: #f23f42;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(88, 101, 242, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(235, 69, 158, 0.06) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
-            padding: 2rem 1.5rem;
-            position: fixed;
-            height: 100vh;
-            width: 280px;
-            overflow-y: auto;
-        }
-
-        .server-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--bg-tertiary);
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .server-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .server-info h2 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .server-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-tertiary);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .nav-section {
-            margin-bottom: 2rem;
-        }
-
-        .nav-section-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-tertiary);
-            margin-bottom: 0.75rem;
-            padding-left: 0.5rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 0.25rem;
-            border: 1px solid transparent;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(88, 101, 242, 0.15), rgba(235, 69, 158, 0.15));
-            color: var(--text-primary);
-            border-color: var(--accent-primary);
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            padding: 2rem;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            animation: slideDown 0.5s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header h1 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-secondary);
-            border-color: var(--accent-primary);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.6s ease backwards;
-        }
-
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-
-        .stat-icon.blue { background: rgba(88, 101, 242, 0.15); color: var(--accent-primary); }
-        .stat-icon.pink { background: rgba(235, 69, 158, 0.15); color: var(--accent-secondary); }
-        .stat-icon.green { background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary); }
-        .stat-icon.yellow { background: rgba(240, 178, 50, 0.15); color: var(--warning); }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 2rem;
-            color: var(--text-primary);
-        }
-
-        .stat-change {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-        }
-
-        .stat-change.positive { color: var(--success); }
-        .stat-change.negative { color: var(--danger); }
-
-        /* Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            animation: fadeInUp 0.6s ease 0.5s backwards;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .card-action {
-            color: var(--accent-primary);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .card-action:hover {
-            color: var(--accent-secondary);
-        }
-
-        /* Activity Log */
-        .activity-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            margin-bottom: 0.75rem;
-            transition: all 0.2s ease;
-        }
-
-        .activity-item:hover {
-            background: var(--bg-primary);
-            transform: translateX(4px);
-        }
-
-        .activity-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .activity-meta {
-            color: var(--text-tertiary);
-            font-size: 0.85rem;
-        }
-
-        /* Members List */
-        .member-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            margin-bottom: 0.75rem;
-            transition: all 0.2s ease;
-        }
-
-        .member-item:hover {
-            background: var(--bg-primary);
-            border-color: var(--accent-primary);
-        }
-
-        .member-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            position: relative;
-        }
-
-        .member-status {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid var(--bg-tertiary);
-        }
-
-        .member-status.online { background: var(--accent-tertiary); }
-        .member-status.idle { background: var(--warning); }
-        .member-status.offline { background: var(--text-tertiary); }
-
-        .member-info {
-            flex: 1;
-        }
-
-        .member-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .member-role {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .member-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .icon-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--text-secondary);
-        }
-
-        .icon-btn:hover {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-            color: white;
-        }
-
-        /* Full Width Cards */
-        .full-width-card {
-            grid-column: 1 / -1;
-        }
-
-        /* Role Badge */
-        .role-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
-
-        .role-badge.admin {
-            background: rgba(240, 71, 71, 0.15);
-            color: #f04747;
-            border: 1px solid rgba(240, 71, 71, 0.3);
-        }
-
-        .role-badge.moderator {
-            background: rgba(88, 101, 242, 0.15);
-            color: var(--accent-primary);
-            border: 1px solid rgba(88, 101, 242, 0.3);
-        }
-
-        .role-badge.member {
-            background: rgba(87, 242, 135, 0.15);
-            color: var(--accent-tertiary);
-            border: 1px solid rgba(87, 242, 135, 0.3);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                display: none;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <meta name="description" content="CRG - Services professionnels de développement web, FiveM, Discord et sécurité. Une équipe d'experts à votre service.">
+    <meta name="keywords" content="développement web, FiveM, Discord bot, sécurité web, CRG">
+    <title>CRG - Excellence Digitale | Or & Prestige</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="server-header">
-                <div class="server-icon">MS</div>
-                <div class="server-info">
-                    <h2>Mon Serveur</h2>
-                    <div class="server-status">
-                        <span class="status-dot"></span>
-                        <span>1,247 membres</span>
-                    </div>
-                </div>
+    <!-- Loader Animation -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-logo">CRG</div>
+            <div class="loader-bar">
+                <div class="loader-progress"></div>
             </div>
-
-            <nav>
-                <div class="nav-section">
-                    <div class="nav-section-title">Principal</div>
-                    <div class="nav-item active">
-                        <div class="nav-icon">📊</div>
-                        <span>Vue d'ensemble</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">👥</div>
-                        <span>Membres</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">💬</div>
-                        <span>Canaux</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">🎭</div>
-                        <span>Rôles</span>
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Modération</div>
-                    <div class="nav-item">
-                        <div class="nav-icon">🛡️</div>
-                        <span>AutoMod</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">📋</div>
-                        <span>Logs</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">⚠️</div>
-                        <span>Avertissements</span>
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Configuration</div>
-                    <div class="nav-item">
-                        <div class="nav-icon">⚙️</div>
-                        <span>Paramètres</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">🤖</div>
-                        <span>Bots</span>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-icon">🎨</div>
-                        <span>Personnalisation</span>
-                    </div>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="header">
-                <h1>Vue d'ensemble</h1>
-                <div class="header-actions">
-                    <button class="btn btn-secondary">⚙️ Paramètres</button>
-                    <button class="btn btn-primary">✨ Inviter des membres</button>
-                </div>
-            </header>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon blue">👥</div>
-                    </div>
-                    <div class="stat-label">Membres totaux</div>
-                    <div class="stat-value">1,247</div>
-                    <div class="stat-change positive">↑ +23 cette semaine</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon green">✅</div>
-                    </div>
-                    <div class="stat-label">Membres en ligne</div>
-                    <div class="stat-value">342</div>
-                    <div class="stat-change positive">↑ +12% vs hier</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon pink">💬</div>
-                    </div>
-                    <div class="stat-label">Messages (24h)</div>
-                    <div class="stat-value">8,934</div>
-                    <div class="stat-change positive">↑ +456 vs hier</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon yellow">⚠️</div>
-                    </div>
-                    <div class="stat-label">Alertes modération</div>
-                    <div class="stat-value">3</div>
-                    <div class="stat-change negative">↓ -2 vs hier</div>
-                </div>
-            </div>
-
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- Activity Log -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Activité récente</h3>
-                        <span class="card-action">Voir tout →</span>
-                    </div>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon green" style="background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary);">
-                                ✅
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nouveau membre rejoint</div>
-                                <div class="activity-meta">@Alexandre_42 a rejoint le serveur • Il y a 5 min</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon blue" style="background: rgba(88, 101, 242, 0.15); color: var(--accent-primary);">
-                                🎭
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Rôle modifié</div>
-                                <div class="activity-meta">@Marie a reçu le rôle Modérateur • Il y a 15 min</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon pink" style="background: rgba(235, 69, 158, 0.15); color: var(--accent-secondary);">
-                                💬
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nouveau canal créé</div>
-                                <div class="activity-meta">#annonces-importantes a été créé • Il y a 1h</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon yellow" style="background: rgba(240, 178, 50, 0.15); color: var(--warning);">
-                                ⚠️
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Avertissement émis</div>
-                                <div class="activity-meta">@User123 a reçu un avertissement pour spam • Il y a 2h</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon green" style="background: rgba(87, 242, 135, 0.15); color: var(--accent-tertiary);">
-                                🤖
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Bot configuré</div>
-                                <div class="activity-meta">MusicBot a été ajouté au serveur • Il y a 3h</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Members -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Membres actifs</h3>
-                        <span class="card-action">Voir tout →</span>
-                    </div>
-                    <div class="members-list">
-                        <div class="member-item">
-                            <div class="member-avatar">
-                                AM
-                                <span class="member-status online"></span>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name">Alexandre_M</div>
-                                <div class="member-role">
-                                    <span class="role-badge admin">Admin</span>
-                                </div>
-                            </div>
-                            <div class="member-actions">
-                                <div class="icon-btn">💬</div>
-                                <div class="icon-btn">⚙️</div>
-                            </div>
-                        </div>
-
-                        <div class="member-item">
-                            <div class="member-avatar">
-                                ML
-                                <span class="member-status online"></span>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name">Marie_L</div>
-                                <div class="member-role">
-                                    <span class="role-badge moderator">Modérateur</span>
-                                </div>
-                            </div>
-                            <div class="member-actions">
-                                <div class="icon-btn">💬</div>
-                                <div class="icon-btn">⚙️</div>
-                            </div>
-                        </div>
-
-                        <div class="member-item">
-                            <div class="member-avatar">
-                                TD
-                                <span class="member-status idle"></span>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name">Thomas_D</div>
-                                <div class="member-role">
-                                    <span class="role-badge member">Membre</span>
-                                </div>
-                            </div>
-                            <div class="member-actions">
-                                <div class="icon-btn">💬</div>
-                                <div class="icon-btn">⚙️</div>
-                            </div>
-                        </div>
-
-                        <div class="member-item">
-                            <div class="member-avatar">
-                                SB
-                                <span class="member-status online"></span>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name">Sophie_B</div>
-                                <div class="member-role">
-                                    <span class="role-badge member">Membre</span>
-                                </div>
-                            </div>
-                            <div class="member-actions">
-                                <div class="icon-btn">💬</div>
-                                <div class="icon-btn">⚙️</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Full Width Card - Moderation -->
-            <div class="card full-width-card">
-                <div class="card-header">
-                    <h3 class="card-title">Paramètres de modération rapide</h3>
-                    <span class="card-action">Configurer →</span>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon blue">🛡️</div>
-                        </div>
-                        <div class="stat-label">Niveau de vérification</div>
-                        <div class="stat-value" style="font-size: 1.5rem;">Élevé</div>
-                        <div class="stat-change" style="color: var(--text-secondary);">Email vérifié requis</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon green">✅</div>
-                        </div>
-                        <div class="stat-label">Filtre de contenu</div>
-                        <div class="stat-value" style="font-size: 1.5rem;">Actif</div>
-                        <div class="stat-change" style="color: var(--text-secondary);">Tous les membres</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon pink">🔒</div>
-                        </div>
-                        <div class="stat-label">Messages DM</div>
-                        <div class="stat-value" style="font-size: 1.5rem;">Restreint</div>
-                        <div class="stat-change" style="color: var(--text-secondary);">Nouveaux membres</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon yellow">⏱️</div>
-                        </div>
-                        <div class="stat-label">Timeout automatique</div>
-                        <div class="stat-value" style="font-size: 1.5rem;">10 min</div>
-                        <div class="stat-change" style="color: var(--text-secondary);">Après 3 avertissements</div>
-                    </div>
-                </div>
-            </div>
-        </main>
+            <p class="loader-text">Chargement de l'excellence...</p>
+        </div>
     </div>
 
-    <script>
-        // Simulate real-time updates
-        function updateStats() {
-            const statValues = document.querySelectorAll('.stat-value');
-            statValues.forEach((stat, index) => {
-                if (Math.random() > 0.7) {
-                    const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
-                    const change = Math.floor(Math.random() * 10) - 5;
-                    const newValue = Math.max(0, currentValue + change);
-                    stat.textContent = newValue.toLocaleString('fr-FR');
-                }
-            });
-        }
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre utilisation des cookies.</p>
+            <div class="cookie-buttons">
+                <button class="btn-cookie accept">Accepter</button>
+                <button class="btn-cookie decline">Refuser</button>
+            </div>
+        </div>
+    </div>
 
-        // Update stats every 5 seconds
-        setInterval(updateStats, 5000);
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Retour en haut">
+        <span>↑</span>
+    </button>
 
-        // Navigation interaction
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème">
+        <span class="sun-icon">☀️</span>
+        <span class="moon-icon">🌙</span>
+    </button>
 
-        // Member action buttons
-        document.querySelectorAll('.icon-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 100);
-            });
-        });
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+    </div>
 
-        // Activity items hover effect
-        document.querySelectorAll('.activity-item, .member-item').forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            });
-        });
-    </script>
+    <!-- Effet de grille luxe en arrière-plan -->
+    <div class="luxury-grid"></div>
+    
+    <!-- Particules dorées flottantes -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">CRG</span>
+                <span class="logo-tagline">Excellence Digitale</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#accueil" class="nav-link active">ACCUEIL</a></li>
+                <li><a href="#about" class="nav-link">À PROPOS</a></li>
+                <li><a href="#services" class="nav-link">SERVICES</a></li>
+                <li><a href="#pricing" class="nav-link">TARIFS</a></li>
+                <li><a href="#portfolio" class="nav-link">PORTFOLIO</a></li>
+                <li><a href="#testimonials" class="nav-link">TÉMOIGNAGES</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><a href="#blog" class="nav-link">BLOG</a></li>
+                <li><a href="#contact" class="nav-link">CONTACT</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section Hero -->
+    <section id="accueil" class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-icon">👑</span>
+                <span class="badge-text">SERVICES PREMIUM</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line">BIENVENUE DANS</span>
+                <span class="title-line gold-text">L'EXCELLENCE</span>
+                <span class="title-line">DIGITALE</span>
+            </h1>
+            <p class="hero-subtitle">CRG - Votre partenaire de confiance pour tous vos projets numériques</p>
+            <div class="golden-line"></div>
+            <p class="hero-description">
+                Une équipe d'experts dédiée à transformer vos idées en réalités digitales exceptionnelles. 
+                Développement web, serveurs FiveM, bots Discord et solutions de sécurité de pointe.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn-gold btn-primary">
+                    <span>DÉCOUVRIR NOS SERVICES</span>
+                    <div class="btn-shine"></div>
+                </button>
+                <button class="btn-gold btn-secondary">
+                    <span>DEMANDER UN DEVIS</span>
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+            <div class="hero-stats-mini">
+                <div class="mini-stat">
+                    <span class="mini-number">50+</span>
+                    <span class="mini-label">Projets</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-number">100%</span>
+                    <span class="mini-label">Satisfaction</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-number">24/7</span>
+                    <span class="mini-label">Support</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="golden-orb orb-1"></div>
+            <div class="golden-orb orb-2"></div>
+            <div class="golden-orb orb-3"></div>
+            <div class="code-matrix"></div>
+        </div>
+    </section>
+
+    <!-- Section Statistiques -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-number" data-target="50">0</div>
+                <div class="stat-label">PROJETS RÉALISÉS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">😊</div>
+                <div class="stat-number" data-target="100">0</div>
+                <div class="stat-percent">%</div>
+                <div class="stat-label">CLIENTS SATISFAITS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-number" data-target="24">0</div>
+                <div class="stat-slash">/7</div>
+                <div class="stat-label">SUPPORT DISPONIBLE</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-number" data-target="4.9">0</div>
+                <div class="stat-slash">/5</div>
+                <div class="stat-label">NOTE MOYENNE</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section À Propos / Team -->
+    <section id="about" class="about-section">
+        <div class="section-header">
+            <h2 class="section-title">QUI SOMMES-NOUS ?</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Une équipe passionnée au service de vos ambitions digitales</p>
+        </div>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Notre Mission</h3>
+                <p>Chez CRG, nous croyons que chaque projet mérite l'excellence. Notre équipe d'experts combine créativité, expertise technique et engagement client pour livrer des solutions digitales qui dépassent les attentes.</p>
+                <p>Spécialisés dans le développement web sur mesure, la création de serveurs FiveM immersifs, le développement de bots Discord performants et les solutions de sécurité avancées, nous mettons notre savoir-faire au service de votre réussite.</p>
+                <div class="about-values">
+                    <div class="value-item">
+                        <span class="value-icon">✨</span>
+                        <span class="value-text">Excellence</span>
+                    </div>
+                    <div class="value-item">
+                        <span class="value-icon">🤝</span>
+                        <span class="value-text">Confiance</span>
+                    </div>
+                    <div class="value-item">
+                        <span class="value-icon">🎯</span>
+                        <span class="value-text">Précision</span>
+                    </div>
+                    <div class="value-item">
+                        <span class="value-icon">💡</span>
+                        <span class="value-text">Innovation</span>
+                    </div>
+                </div>
+            </div>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span class="avatar-initial">M</span>
+                    </div>
+                    <h4 class="member-name">Maholo</h4>
+                    <p class="member-role">Fondateur & Lead Developer</p>
+                    <p class="member-description">Expert en développement web et FiveM avec plus de 5 ans d'expérience</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">Web Dev</span>
+                        <span class="skill-tag">FiveM</span>
+                        <span class="skill-tag">Lua</span>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span class="avatar-initial">K</span>
+                    </div>
+                    <h4 class="member-name">Kini</h4>
+                    <p class="member-role">Co-Fondateur & Security Expert</p>
+                    <p class="member-description">Spécialiste en cybersécurité et développement Discord</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">Security</span>
+                        <span class="skill-tag">Discord</span>
+                        <span class="skill-tag">Node.js</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Services -->
+    <section id="services" class="services">
+        <div class="section-header">
+            <h2 class="section-title">NOS SERVICES PREMIUM</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Des solutions sur mesure pour tous vos besoins</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">⚡</div>
+                <h3 class="card-title">DÉVELOPPEMENT WEB</h3>
+                <p class="card-description">
+                    Sites web modernes et performants, développés sur mesure selon vos besoins et votre identité visuelle
+                </p>
+                <ul class="service-features">
+                    <li>✓ Design responsive et moderne</li>
+                    <li>✓ Optimisation SEO incluse</li>
+                    <li>✓ Hébergement et maintenance</li>
+                    <li>✓ Performance optimale</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">50€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+
+            <div class="service-card featured">
+                <div class="featured-badge">⭐ POPULAIRE</div>
+                <div class="card-glow"></div>
+                <div class="card-icon">🎮</div>
+                <h3 class="card-title">DÉVELOPPEMENT FIVEM</h3>
+                <p class="card-description">
+                    Serveurs FiveM complets et personnalisés, scripts optimisés et support continu
+                </p>
+                <ul class="service-features">
+                    <li>✓ Scripts personnalisés</li>
+                    <li>✓ Configuration complète</li>
+                    <li>✓ Optimisation serveur</li>
+                    <li>✓ Support 24/7</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">55€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+
+            <div class="service-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🎓</div>
+                <h3 class="card-title">FORMATIONS STAFF</h3>
+                <p class="card-description">
+                    Formations complètes pour votre équipe de modération et administration
+                </p>
+                <ul class="service-features">
+                    <li>✓ Formation personnalisée</li>
+                    <li>✓ Support documentation</li>
+                    <li>✓ Certification incluse</li>
+                    <li>✓ Suivi après formation</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">25€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+
+            <div class="service-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🤖</div>
+                <h3 class="card-title">BOT DISCORD</h3>
+                <p class="card-description">
+                    Bots Discord sur mesure avec fonctionnalités avancées et interface intuitive
+                </p>
+                <ul class="service-features">
+                    <li>✓ Fonctionnalités custom</li>
+                    <li>✓ Modération automatique</li>
+                    <li>✓ Système de niveaux</li>
+                    <li>✓ Mises à jour gratuites</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">20€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+
+            <div class="service-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🔒</div>
+                <h3 class="card-title">SÉCURITÉ WEB</h3>
+                <p class="card-description">
+                    Protection avancée contre toutes les menaces, monitoring 24/7 et interventions rapides
+                </p>
+                <ul class="service-features">
+                    <li>✓ Protection DDoS</li>
+                    <li>✓ Firewall avancé</li>
+                    <li>✓ Monitoring 24/7</li>
+                    <li>✓ Certificat SSL inclus</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">84.99€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+
+            <div class="service-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🎨</div>
+                <h3 class="card-title">DESIGN GRAPHIQUE</h3>
+                <p class="card-description">
+                    Création de logos, bannières, interfaces et identités visuelles complètes
+                </p>
+                <ul class="service-features">
+                    <li>✓ Logo professionnel</li>
+                    <li>✓ Charte graphique</li>
+                    <li>✓ Bannières réseaux</li>
+                    <li>✓ Révisions illimitées</li>
+                </ul>
+                <div class="card-price">
+                    <span class="price-from">À partir de</span>
+                    <span class="price-amount">35€</span>
+                </div>
+                <button class="btn-gold btn-service">
+                    <span>EN SAVOIR PLUS</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Tarifs Détaillés -->
+    <section id="pricing" class="pricing-section">
+        <div class="section-header">
+            <h2 class="section-title">NOS FORMULES</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Choisissez la formule qui correspond à vos besoins</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3 class="pricing-name">STARTER</h3>
+                    <p class="pricing-desc">Pour les petits projets</p>
+                </div>
+                <div class="pricing-price">
+                    <span class="price-currency">€</span>
+                    <span class="price-value">50</span>
+                    <span class="price-period">/projet</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✓ Site web 1-3 pages</li>
+                    <li>✓ Design responsive</li>
+                    <li>✓ Formulaire de contact</li>
+                    <li>✓ 1 mois de support</li>
+                    <li>✗ SEO avancé</li>
+                    <li>✗ Hébergement</li>
+                </ul>
+                <button class="btn-gold btn-pricing">
+                    <span>CHOISIR</span>
+                </button>
+            </div>
+
+            <div class="pricing-card featured">
+                <div class="pricing-badge">⭐ RECOMMANDÉ</div>
+                <div class="pricing-header">
+                    <h3 class="pricing-name">PROFESSIONAL</h3>
+                    <p class="pricing-desc">Le meilleur rapport qualité/prix</p>
+                </div>
+                <div class="pricing-price">
+                    <span class="price-currency">€</span>
+                    <span class="price-value">150</span>
+                    <span class="price-period">/projet</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✓ Site web illimité pages</li>
+                    <li>✓ Design sur mesure</li>
+                    <li>✓ SEO optimisé</li>
+                    <li>✓ 3 mois de support</li>
+                    <li>✓ Hébergement 1 an</li>
+                    <li>✓ Formation incluse</li>
+                </ul>
+                <button class="btn-gold btn-pricing">
+                    <span>CHOISIR</span>
+                </button>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3 class="pricing-name">ENTERPRISE</h3>
+                    <p class="pricing-desc">Solutions complètes</p>
+                </div>
+                <div class="pricing-price">
+                    <span class="price-currency">€</span>
+                    <span class="price-value">500</span>
+                    <span class="price-period">+/projet</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>✓ Solution complète</li>
+                    <li>✓ Application web/mobile</li>
+                    <li>✓ Design premium</li>
+                    <li>✓ Support prioritaire</li>
+                    <li>✓ Hébergement premium</li>
+                    <li>✓ Maintenance continue</li>
+                </ul>
+                <button class="btn-gold btn-pricing">
+                    <span>NOUS CONTACTER</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Portfolio -->
+    <section id="portfolio" class="portfolio">
+        <div class="section-header">
+            <h2 class="section-title">NOS RÉALISATIONS</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Découvrez quelques-uns de nos projets récents</p>
+        </div>
+        
+        <!-- Filtres Portfolio -->
+        <div class="portfolio-filters">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <button class="filter-btn" data-filter="web">Web Design</button>
+            <button class="filter-btn" data-filter="fivem">FiveM</button>
+            <button class="filter-btn" data-filter="discord">Discord</button>
+            <button class="filter-btn" data-filter="security">Sécurité</button>
+        </div>
+
+        <div class="portfolio-grid">
+            <div class="portfolio-card" data-category="web">
+                <div class="portfolio-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🌐</span>
+                        <span class="placeholder-text">Site E-Commerce</span>
+                    </div>
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-header">
+                        <div class="portfolio-number">01</div>
+                        <div class="portfolio-status completed">TERMINÉ</div>
+                    </div>
+                    <h3 class="portfolio-title">BOUTIQUE EN LIGNE</h3>
+                    <p class="portfolio-description">Site e-commerce complet avec système de paiement intégré et gestion de stock.</p>
+                    <div class="portfolio-footer">
+                        <span class="portfolio-tag">WEB DESIGN</span>
+                        <span class="portfolio-tag">E-COMMERCE</span>
+                    </div>
+                    <button class="portfolio-btn">VOIR PLUS →</button>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-category="fivem">
+                <div class="portfolio-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🎮</span>
+                        <span class="placeholder-text">Serveur RP</span>
+                    </div>
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-header">
+                        <div class="portfolio-number">02</div>
+                        <div class="portfolio-status completed">TERMINÉ</div>
+                    </div>
+                    <h3 class="portfolio-title">SERVEUR ROLEPLAY</h3>
+                    <p class="portfolio-description">Serveur FiveM RP avec scripts custom et économie équilibrée.</p>
+                    <div class="portfolio-footer">
+                        <span class="portfolio-tag">FIVEM</span>
+                        <span class="portfolio-tag">LUA</span>
+                    </div>
+                    <button class="portfolio-btn">VOIR PLUS →</button>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-category="discord">
+                <div class="portfolio-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🤖</span>
+                        <span class="placeholder-text">Bot Modération</span>
+                    </div>
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-header">
+                        <div class="portfolio-number">03</div>
+                        <div class="portfolio-status completed">TERMINÉ</div>
+                    </div>
+                    <h3 class="portfolio-title">BOT MULTIFONCTIONS</h3>
+                    <p class="portfolio-description">Bot Discord avec modération automatique et système de niveaux.</p>
+                    <div class="portfolio-footer">
+                        <span class="portfolio-tag">DISCORD</span>
+                        <span class="portfolio-tag">AUTOMATION</span>
+                    </div>
+                    <button class="portfolio-btn">VOIR PLUS →</button>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-category="web">
+                <div class="portfolio-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">💼</span>
+                        <span class="placeholder-text">Site Corporate</span>
+                    </div>
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-header">
+                        <div class="portfolio-number">04</div>
+                        <div class="portfolio-status progress">EN COURS</div>
+                    </div>
+                    <h3 class="portfolio-title">SITE CORPORATE</h3>
+                    <p class="portfolio-description">Site vitrine moderne pour entreprise avec animations avancées.</p>
+                    <div class="portfolio-footer">
+                        <span class="portfolio-tag">WEB DESIGN</span>
+                        <span class="portfolio-tag">CORPORATE</span>
+                    </div>
+                    <button class="portfolio-btn">VOIR PLUS →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Témoignages -->
+    <section id="testimonials" class="testimonials">
+        <div class="section-header">
+            <h2 class="section-title">CE QU'ILS DISENT DE NOUS</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">La satisfaction client est notre priorité</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "Excellent travail ! Le site web dépasse toutes mes attentes. L'équipe CRG est professionnelle, réactive et à l'écoute. Je recommande vivement leurs services."
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>J</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Jean Dupont</h4>
+                        <p class="author-role">Propriétaire E-Commerce</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "Mon serveur FiveM fonctionne parfaitement grâce à CRG. Les scripts sont optimisés et le support est incroyable. Merci pour votre professionnalisme !"
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>M</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Marie Laurent</h4>
+                        <p class="author-role">Admin Serveur RP</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "Bot Discord parfait pour notre communauté. Toutes les fonctionnalités demandées ont été implémentées avec soin. Service 5 étoiles !"
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>A</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Alex Martin</h4>
+                        <p class="author-role">Community Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "La sécurité de mon site est maintenant au top niveau. Plus aucune attaque depuis l'intervention de CRG. Je dors sur mes deux oreilles !"
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>S</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Sophie Bernard</h4>
+                        <p class="author-role">CEO Startup</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "Formation staff complète et efficace. Notre équipe est maintenant autonome et confiante. Excellent rapport qualité/prix !"
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>T</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Thomas Petit</h4>
+                        <p class="author-role">Manager Discord</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">
+                    "Design graphique exceptionnel ! Mon logo est exactement ce que j'imaginais. CRG a su capturer l'essence de ma marque."
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <span>L</span>
+                    </div>
+                    <div class="author-info">
+                        <h4 class="author-name">Lucas Moreau</h4>
+                        <p class="author-role">Entrepreneur</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section FAQ -->
+    <section id="faq" class="faq-section">
+        <div class="section-header">
+            <h2 class="section-title">QUESTIONS FRÉQUENTES</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Trouvez rapidement les réponses à vos questions</p>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Quels sont vos délais de livraison ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Les délais varient selon la complexité du projet. En moyenne : sites web (1-2 semaines), serveurs FiveM (2-4 semaines), bots Discord (3-7 jours). Nous établissons un calendrier précis lors de la commande.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Quels moyens de paiement acceptez-vous ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Nous acceptons PayPal, virements bancaires, cartes de crédit et cryptomonnaies. Un acompte de 30% est demandé au démarrage du projet, le solde à la livraison.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Proposez-vous une garantie ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Oui ! Tous nos projets incluent une garantie de 30 jours. Nous corrigeons gratuitement tout bug ou problème technique durant cette période. Le support technique est également inclus selon votre formule.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Comment se déroule le processus de commande ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>1) Prise de contact et brief du projet, 2) Devis détaillé et validation, 3) Acompte et démarrage, 4) Développement avec points d'étape, 5) Livraison et formation, 6) Support et maintenance.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Puis-je demander des modifications après livraison ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolument ! Les formules Professional et Enterprise incluent des révisions. Pour les modifications majeures après livraison, nous établissons un devis complémentaire adapté.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Offrez-vous un support après la livraison ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Oui, le support est inclus selon votre formule (1 à 6 mois). Nous proposons aussi des contrats de maintenance mensuels pour un support continu et des mises à jour régulières.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Travaillez-vous avec des clients internationaux ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Oui ! Nous travaillons avec des clients partout dans le monde. Notre communication se fait principalement via Discord, email et visio. Nous parlons français et anglais.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Puis-je voir des exemples de vos réalisations ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Consultez notre section Portfolio ci-dessus ! Pour des exemples spécifiques à votre projet, contactez-nous sur Discord ou par email avec vos besoins.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Blog -->
+    <section id="blog" class="blog-section">
+        <div class="section-header">
+            <h2 class="section-title">ACTUALITÉS & CONSEILS</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Restez informé des dernières tendances tech</p>
+        </div>
+        <div class="blog-grid">
+            <article class="blog-card">
+                <div class="blog-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">📱</span>
+                    </div>
+                    <div class="blog-category">WEB DESIGN</div>
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-date">15 Janvier 2026</span>
+                        <span class="blog-reading">5 min</span>
+                    </div>
+                    <h3 class="blog-title">Les tendances web design 2026</h3>
+                    <p class="blog-excerpt">Découvrez les nouvelles tendances qui vont dominer le design web cette année : minimalisme doré, animations fluides...</p>
+                    <button class="btn-blog">Lire l'article →</button>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🎮</span>
+                    </div>
+                    <div class="blog-category">FIVEM</div>
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-date">10 Janvier 2026</span>
+                        <span class="blog-reading">8 min</span>
+                    </div>
+                    <h3 class="blog-title">Comment optimiser votre serveur FiveM</h3>
+                    <p class="blog-excerpt">Guide complet pour améliorer les performances de votre serveur et offrir la meilleure expérience à vos joueurs...</p>
+                    <button class="btn-blog">Lire l'article →</button>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image">
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🔒</span>
+                    </div>
+                    <div class="blog-category">SÉCURITÉ</div>
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-date">5 Janvier 2026</span>
+                        <span class="blog-reading">6 min</span>
+                    </div>
+                    <h3 class="blog-title">Protégez votre site contre les cyberattaques</h3>
+                    <p class="blog-excerpt">Les meilleures pratiques de sécurité web en 2026. Firewall, SSL, authentification à deux facteurs et plus...</p>
+                    <button class="btn-blog">Lire l'article →</button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Devis Rapide -->
+    <section class="quick-quote">
+        <div class="quote-container">
+            <h2 class="quote-title">BESOIN D'UN DEVIS RAPIDE ?</h2>
+            <p class="quote-subtitle">Obtenez une estimation instantanée de votre projet</p>
+            <form class="quote-form" id="quickQuoteForm">
+                <div class="quote-step active" data-step="1">
+                    <h3>Quel type de projet ?</h3>
+                    <div class="quote-options">
+                        <label class="quote-option">
+                            <input type="radio" name="projectType" value="web" required>
+                            <span class="option-content">
+                                <span class="option-icon">⚡</span>
+                                <span class="option-text">Site Web</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="projectType" value="fivem">
+                            <span class="option-content">
+                                <span class="option-icon">🎮</span>
+                                <span class="option-text">FiveM</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="projectType" value="discord">
+                            <span class="option-content">
+                                <span class="option-icon">🤖</span>
+                                <span class="option-text">Bot Discord</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="projectType" value="security">
+                            <span class="option-content">
+                                <span class="option-icon">🔒</span>
+                                <span class="option-text">Sécurité</span>
+                            </span>
+                        </label>
+                    </div>
+                    <button type="button" class="btn-gold btn-next">Suivant →</button>
+                </div>
+
+                <div class="quote-step" data-step="2">
+                    <h3>Budget estimé ?</h3>
+                    <div class="quote-options">
+                        <label class="quote-option">
+                            <input type="radio" name="budget" value="50-150" required>
+                            <span class="option-content">
+                                <span class="option-text">50€ - 150€</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="budget" value="150-350">
+                            <span class="option-content">
+                                <span class="option-text">150€ - 350€</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="budget" value="350-500">
+                            <span class="option-content">
+                                <span class="option-text">350€ - 500€</span>
+                            </span>
+                        </label>
+                        <label class="quote-option">
+                            <input type="radio" name="budget" value="500+">
+                            <span class="option-content">
+                                <span class="option-text">500€ +</span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="quote-navigation">
+                        <button type="button" class="btn-gold btn-prev">← Retour</button>
+                        <button type="button" class="btn-gold btn-next">Suivant →</button>
+                    </div>
+                </div>
+
+                <div class="quote-step" data-step="3">
+                    <h3>Vos coordonnées</h3>
+                    <div class="quote-inputs">
+                        <input type="text" name="name" placeholder="Votre nom" required class="quote-input">
+                        <input type="email" name="email" placeholder="Votre email" required class="quote-input">
+                        <textarea name="details" placeholder="Décrivez brièvement votre projet" rows="4" class="quote-input"></textarea>
+                    </div>
+                    <div class="quote-navigation">
+                        <button type="button" class="btn-gold btn-prev">← Retour</button>
+                        <button type="submit" class="btn-gold btn-submit-quote">Obtenir mon devis</button>
+                    </div>
+                </div>
+
+                <div class="quote-result" id="quoteResult">
+                    <div class="result-icon">✅</div>
+                    <h3>Demande envoyée !</h3>
+                    <p>Merci ! Nous reviendrons vers vous sous 24h avec un devis détaillé.</p>
+                    <button type="button" class="btn-gold" onclick="location.reload()">Nouvelle demande</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Section Contact -->
+    <section id="contact" class="contact">
+        <div class="section-header">
+            <h2 class="section-title">CONTACTEZ-NOUS</h2>
+            <div class="golden-underline"></div>
+            <p class="section-subtitle">Une question ? Un projet ? Parlons-en !</p>
+        </div>
+        <div class="contact-content">
+            <form class="contact-form" action="https://formsubmit.co/maholo.contact@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="Nouveau message depuis CRG Premium">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="text" name="_honey" style="display:none">
+                <input type="hidden" name="_next" value="https://yoursite.com/merci.html">
+                
+                <div class="form-group">
+                    <label for="nom">Nom complet</label>
+                    <input type="text" id="nom" name="nom" class="form-input" placeholder="Jean Dupont" required>
+                    <div class="input-line"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="jean.dupont@email.com" required>
+                    <div class="input-line"></div>
+                </div>
+                <div class="form-group">
+                    <label for="service">Service souhaité</label>
+                    <select id="service" name="service" class="form-input" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="web">Développement Web</option>
+                        <option value="fivem">FiveM</option>
+                        <option value="discord">Bot Discord</option>
+                        <option value="security">Sécurité</option>
+                        <option value="formation">Formation Staff</option>
+                        <option value="design">Design Graphique</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                    <div class="input-line"></div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" class="form-input" rows="6" placeholder="Décrivez votre projet..." required></textarea>
+                    <div class="input-line"></div>
+                </div>
+                <button type="submit" class="btn-gold btn-submit">
+                    <span>ENVOYER LE MESSAGE</span>
+                    <div class="btn-shine"></div>
+                </button>
+            </form>
+            
+            <div class="contact-info">
+                <div class="info-card">
+                    <div class="info-icon">📧</div>
+                    <h3>EMAIL</h3>
+                    <p>maholo.contact@gmail.com</p>
+                    <span class="info-label">Réponse sous 24h</span>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">📱</div>
+                    <h3>DISCORD</h3>
+                    <p>woody_2009</p>
+                    <span class="info-label">Support instantané</span>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">💬</div>
+                    <h3>SERVEUR DISCORD</h3>
+                    <p><a href="https://discord.gg/j8vvbFgy" target="_blank">Rejoindre</a></p>
+                    <span class="info-label">Communauté active</span>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">⏰</div>
+                    <h3>HORAIRES</h3>
+                    <p>Lun - Dim : 24/7</p>
+                    <span class="info-label">Support continu</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Politique & CGV -->
+    <section class="legal-section">
+        <div class="legal-container">
+            <div class="legal-links">
+                <a href="#" class="legal-link" id="privacyLink">Politique de Confidentialité</a>
+                <a href="#" class="legal-link" id="termsLink">Conditions Générales de Vente</a>
+                <a href="#" class="legal-link" id="cookiesLink">Politique des Cookies</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3 class="footer-title">CRG</h3>
+                <p class="footer-desc">Excellence digitale depuis 2024. Votre partenaire de confiance pour tous vos projets web.</p>
+                <div class="footer-social">
+                    <a href="https://discord.gg/j8vvbFgy" target="_blank" class="social-icon">💬</a>
+                    <a href="mailto:maholo.contact@gmail.com" class="social-icon">📧</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-subtitle">Services</h4>
+                <ul class="footer-list">
+                    <li><a href="#services">Développement Web</a></li>
+                    <li><a href="#services">FiveM</a></li>
+                    <li><a href="#services">Bot Discord</a></li>
+                    <li><a href="#services">Sécurité</a></li>
+                    <li><a href="#services">Formation Staff</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-subtitle">À propos</h4>
+                <ul class="footer-list">
+                    <li><a href="#about">Notre équipe</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                    <li><a href="#testimonials">Témoignages</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-subtitle">Contact</h4>
+                <ul class="footer-list">
+                    <li>📧 maholo.contact@gmail.com</li>
+                    <li>💬 Discord: woody_2009</li>
+                    <li>🌐 <a href="https://discord.gg/j8vvbFgy" target="_blank">Serveur Discord</a></li>
+                    <li>⏰ Support 24/7</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CRG - Tous droits réservés.</p>
+            <div class="footer-credits">
+                <span>Conçu avec</span>
+                <span class="heart">❤️</span>
+                <span>par l'équipe CRG</span>
+            </div>
+        </div>
+        <div class="footer-glow"></div>
+    </footer>
+
+    <!-- Modal Privacy Policy -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Politique de Confidentialité</h2>
+            <div class="modal-body">
+                <h3>1. Collecte des informations</h3>
+                <p>Nous collectons les informations que vous nous fournissez directement via nos formulaires de contact.</p>
+                
+                <h3>2. Utilisation des informations</h3>
+                <p>Vos informations sont utilisées uniquement pour répondre à vos demandes et améliorer nos services.</p>
+                
+                <h3>3. Protection des données</h3>
+                <p>Nous utilisons des mesures de sécurité pour protéger vos informations personnelles.</p>
+                
+                <h3>4. Vos droits</h3>
+                <p>Vous avez le droit d'accéder, de modifier ou de supprimer vos données personnelles.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Terms -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Conditions Générales de Vente</h2>
+            <div class="modal-body">
+                <h3>1. Prestations</h3>
+                <p>CRG s'engage à fournir des services de développement de qualité selon les spécifications convenues.</p>
+                
+                <h3>2. Tarifs et Paiement</h3>
+                <p>Un acompte de 30% est requis au démarrage. Le solde est dû à la livraison.</p>
+                
+                <h3>3. Délais</h3>
+                <p>Les délais sont communiqués à titre indicatif et peuvent varier selon la complexité.</p>
+                
+                <h3>4. Garantie</h3>
+                <p>Garantie de 30 jours sur tous nos services pour correction de bugs.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cookies -->
+    <div class="modal" id="cookiesModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Politique des Cookies</h2>
+            <div class="modal-body">
+                <h3>Qu'est-ce qu'un cookie ?</h3>
+                <p>Les cookies sont de petits fichiers stockés sur votre appareil pour améliorer votre expérience.</p>
+                
+                <h3>Comment les utilisons-nous ?</h3>
+                <p>Nous utilisons des cookies pour mémoriser vos préférences et analyser le trafic du site.</p>
+                
+                <h3>Gérer les cookies</h3>
+                <p>Vous pouvez désactiver les cookies dans les paramètres de votre navigateur.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
